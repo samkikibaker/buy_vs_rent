@@ -1,6 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.ticker as mticker
 
 # ---------------------------------------------------------------------
 # Simulation Functions
@@ -345,7 +346,7 @@ with tab_simulation:
             ax.axvspan(crossover_month, months[-1], color="green", alpha=0.2, label="Buying Cheaper")
             ax.annotate(f"Crossover: {format_duration(crossover_month)}",
                         (crossover_month, np.max([buy_cum_spent.max(), rent_cum_spent.max()])),
-                        textcoords="offset points", xytext=(0,20), ha="center", color="black")
+                        textcoords="offset points", xytext=(0,20), ha="center", color="black", arrowprops=dict(arrowstyle="-", color="black", linewidth=1))
 
         # Also plot house price and additional curves for context.
         ax.plot(months, history_buy["house_price"], label="House Price", color="blue")
@@ -359,17 +360,20 @@ with tab_simulation:
             ax.plot(stop_month_buy, net_wealth[stop_month_buy], "ko")
             ax.annotate(f"Buy: {format_duration(stop_month_buy)}",
                         (stop_month_buy, net_wealth[stop_month_buy]),
-                        textcoords="offset points", xytext=(0,15), ha="center", color="green")
+                        textcoords="offset points", xytext=(0,25), ha="center", color="green", arrowprops=dict(arrowstyle="-", color="black", linewidth=1))
         if stop_month_rent is not None and stop_month_rent < len(months):
             ax.plot(stop_month_rent, history_rent["investment_portfolio"][stop_month_rent], "ko")
             ax.annotate(f"Rent: {format_duration(stop_month_rent)}",
                         (stop_month_rent, history_rent["investment_portfolio"][stop_month_rent]),
-                        textcoords="offset points", xytext=(0,-15), ha="center", color="red")
+                        textcoords="offset points", xytext=(0,-25), ha="center", color="red", arrowprops=dict(arrowstyle="-", color="black", linewidth=1))
 
         ax.set_xlabel("Months")
         ax.set_ylabel("£")
         ax.set_title("Homeownership Comparison Over Time")
         ax.legend()
         ax.grid(True)
+        formatter = mticker.FuncFormatter(lambda x, pos: f'£{x:,.0f}')
+        ax.yaxis.set_major_formatter(formatter)
 
+        fig.tight_layout()
         st.pyplot(fig)
